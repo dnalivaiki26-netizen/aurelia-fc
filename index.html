@@ -3,1043 +3,564 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Aurelia FC 11.0</title>
-
+<title>Aurelia Football 11.0</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{
- margin:0;width:100%;height:100%;overflow:hidden;
- font-family:Arial,sans-serif;background:#06132b;color:white;
- touch-action:none
+body{
+ margin:0;background:#071225;color:white;font-family:Arial,sans-serif;
+ overflow:hidden;touch-action:none
 }
 button{
- border:0;border-radius:14px;padding:13px 20px;
- color:white;background:#16478e;font-size:17px;font-weight:700
+ border:0;border-radius:14px;padding:14px 20px;font-weight:800;
+ background:#e9b93f;color:#101827;font-size:16px
 }
-button:active{transform:scale(.95)}
+#app{width:100vw;height:100vh;position:relative;overflow:hidden}
+.screen{display:none;width:100%;height:100%;position:absolute}
+.screen.active{display:block}
 
-.screen{
- display:none;width:100%;height:100%;position:absolute;
- inset:0
-}
-.screen.active{display:flex}
-
-#menu{
- flex-direction:column;align-items:center;justify-content:center;
- background:
- radial-gradient(circle at 50% 20%,#1959a0 0,#0b2857 38%,#040b1c 100%)
+.menu{
+ background:linear-gradient(145deg,#061126,#123b82);
+ display:flex;align-items:center;justify-content:center;
+ text-align:center;padding:25px
 }
 .logo{
- font-size:46px;font-weight:900;color:#ffd447;
- text-shadow:0 4px 12px #000;margin-bottom:5px
+ font-size:46px;font-weight:1000;color:#e9b93f;
+ text-shadow:0 4px 15px #000;margin-bottom:5px
 }
-.crown{font-size:48px}
-.subtitle{font-size:17px;opacity:.9;margin-bottom:30px}
-.menuButtons{display:flex;flex-direction:column;gap:12px;width:250px}
-.menuButtons button{width:100%}
+.sub{opacity:.8;margin-bottom:35px}
+.menu button{display:block;width:270px;margin:12px auto}
 
-#teamScreen{
- background:#081936;flex-direction:column;overflow:auto;
- padding:25px 18px
+.top{
+ position:absolute;top:0;left:0;right:0;height:65px;
+ background:rgba(3,10,25,.9);display:flex;align-items:center;
+ justify-content:space-between;padding:10px 15px;z-index:20
 }
-.title{font-size:30px;font-weight:900;color:#ffd447;margin-bottom:18px}
-.card{
- background:#102b58;border-radius:18px;padding:15px;margin-bottom:12px;
- border:1px solid rgba(255,255,255,.12)
-}
-.playerRow{
- display:flex;align-items:center;justify-content:space-between;
- padding:9px 0;border-bottom:1px solid rgba(255,255,255,.1)
-}
-.playerRow:last-child{border-bottom:0}
-.rating{color:#ffd447;font-weight:900}
+.score{font-size:23px;font-weight:900}
+.timer{font-size:14px;opacity:.8}
 
-#tableScreen{
- background:#081936;flex-direction:column;padding:25px 15px
-}
-table{width:100%;border-collapse:collapse;background:#102b58;border-radius:14px;overflow:hidden}
-th,td{padding:10px 5px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}
-th{color:#ffd447}
-.aureliaRow{background:#174b92;font-weight:900}
+#game{background:#183f20}
+canvas{width:100%;height:100%;display:block}
 
-#kitScreen{
- background:#081936;flex-direction:column;align-items:center;
- padding:25px
+.controls{
+ position:absolute;bottom:20px;left:0;right:0;height:180px;
+ pointer-events:none
 }
-.jersey{
- width:170px;height:200px;margin:20px;
- background:#0758c9;
- clip-path:polygon(18% 0,37% 0,50% 9%,63% 0,82% 0,100% 22%,
- 84% 35%,82% 100%,18% 100%,16% 35%,0 22%);
- position:relative;box-shadow:0 10px 25px #000
+.joy{
+ position:absolute;left:25px;bottom:20px;width:125px;height:125px;
+ border-radius:50%;background:rgba(255,255,255,.12);
+ border:2px solid rgba(255,255,255,.25);pointer-events:auto
 }
-.jersey:after{
- content:"A";position:absolute;top:70px;left:0;right:0;
- text-align:center;font-size:58px;font-weight:900;color:white
+.knob{
+ position:absolute;left:37px;top:37px;width:47px;height:47px;
+ border-radius:50%;background:rgba(255,255,255,.65)
 }
-.goldJersey{background:#d5a91d}
-
-#game{
- background:#0c6e38;
- position:absolute;
- inset:0;
- overflow:hidden
+.actions{
+ position:absolute;right:18px;bottom:12px;
+ display:grid;grid-template-columns:75px 75px;gap:10px;
+ pointer-events:auto
 }
-
-#stadium{
- position:absolute;inset:0;
- background:#16345d
-}
-
-.stand{
- position:absolute;
- background:repeating-linear-gradient(
-  90deg,#202b3c 0,#202b3c 13px,#314057 13px,#314057 20px
- );
- box-shadow:inset 0 -8px 0 #111827
-}
-.stand.top{top:0;left:0;right:0;height:17%}
-.stand.bottom{bottom:0;left:0;right:0;height:17%}
-.stand.left{left:0;top:17%;bottom:17%;width:7%}
-.stand.right{right:0;top:17%;bottom:17%;width:7%}
-
-.flag{
- position:absolute;top:5px;width:25px;height:17px;
- background:#0758c9;border-bottom:4px solid #ffd447
-}
-.flag.f1{left:25%}.flag.f2{left:50%}.flag.f3{left:75%}
-
-#field{
- position:absolute;
- left:7%;right:7%;top:17%;bottom:17%;
- background:
- repeating-linear-gradient(
-  90deg,#178342 0,#178342 9%,#1b8b48 9%,#1b8b48 18%
- );
- overflow:hidden;
- border:3px solid white
-}
-
-.fieldLine{position:absolute;border:2px solid rgba(255,255,255,.8)}
-.centerLine{
- left:50%;top:0;bottom:0;width:2px;background:white;
- transform:translateX(-50%)
-}
-.centerCircle{
- width:130px;height:130px;border-radius:50%;
- left:50%;top:50%;transform:translate(-50%,-50%)
-}
-.boxL,.boxR{
- top:25%;height:50%;width:13%
-}
-.boxL{left:0;border-left:0}
-.boxR{right:0;border-right:0}
-
-.goal{
- position:absolute;top:37%;height:26%;width:4%;
- border:4px solid white;background:rgba(255,255,255,.13);
- z-index:2
-}
-.goalL{left:-1%}.goalR{right:-1%}
-.net{
- position:absolute;inset:0;
- background:
- repeating-linear-gradient(0deg,transparent 0,transparent 9px,
- rgba(255,255,255,.25) 10px),
- repeating-linear-gradient(90deg,transparent 0,transparent 9px,
- rgba(255,255,255,.25) 10px)
-}
-
-.entity{
- position:absolute;transform:translate(-50%,-50%);
- z-index:10;user-select:none
-}
-.player{
- width:40px;height:40px;border-radius:50%;
- background:#0864e5;border:3px solid white;
- box-shadow:0 0 0 3px rgba(255,212,71,.7)
-}
-.teammate{
- width:32px;height:32px;border-radius:50%;
- background:#1974ed;border:2px solid white
-}
-.enemy{
- width:34px;height:34px;border-radius:50%;
- background:#d9263f;border:2px solid white
-}
-.gkBlue{
- width:38px;height:38px;border-radius:50%;
- background:#ffd447;border:3px solid #0758c9
-}
-.gkRed{
- width:38px;height:38px;border-radius:50%;
- background:#ff8a00;border:3px solid #c41632
-}
-.ball{
- width:16px;height:16px;border-radius:50%;
- background:white;border:2px solid #222;
- box-shadow:0 1px 3px #000;z-index:20
-}
-.number{
- position:absolute;top:50%;left:50%;
- transform:translate(-50%,-50%);
- font-size:11px;font-weight:900
-}
-
-#hud{
- position:absolute;z-index:40;top:7px;left:50%;
- transform:translateX(-50%);
- min-width:235px;text-align:center;
- padding:8px 16px;border-radius:15px;
- background:rgba(0,0,0,.75)
-}
-#score{font-size:20px;font-weight:900}
-#clock{font-size:13px;margin-top:2px}
-
-#pause{
- position:absolute;z-index:50;right:10px;top:8px;
- padding:9px 13px
-}
-
-#joy{
- position:absolute;z-index:60;left:22px;bottom:25px;
- width:145px;height:145px;border-radius:50%;
- background:rgba(255,255,255,.13);
+.actions button{
+ width:75px;height:55px;padding:5px;border-radius:50%;
+ background:rgba(255,255,255,.2);color:white;
  border:2px solid rgba(255,255,255,.35)
 }
-#stick{
- position:absolute;left:41px;top:41px;
- width:61px;height:61px;border-radius:50%;
- background:rgba(255,255,255,.75);
- box-shadow:0 3px 10px #000
+.actions .shoot{background:#d63e45}
+.actions .pass{background:#2475d9}
+.actions .tackle{background:#e9b93f;color:#111}
+.actions .sprint{background:#38a96b}
+
+#pauseBtn{
+ position:absolute;right:15px;top:75px;width:48px;height:42px;
+ padding:0;background:rgba(0,0,0,.5);color:white
 }
 
-.action{
- position:absolute;z-index:60;width:73px;height:73px;
- border-radius:50%;padding:0;
- background:rgba(5,25,60,.82);
- border:2px solid rgba(255,255,255,.5)
+.panel{
+ background:linear-gradient(145deg,#071226,#12336b);
+ padding:25px;overflow:auto
 }
-#shoot{right:25px;bottom:108px}
-#pass{right:112px;bottom:37px}
-#cross{right:25px;bottom:20px}
-#sprint{
- left:190px;bottom:34px;width:62px;height:62px;font-size:13px
+.card{
+ background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+ border-radius:18px;padding:18px;margin:12px 0
 }
+.player{
+ display:flex;justify-content:space-between;padding:12px;
+ border-bottom:1px solid rgba(255,255,255,.1)
+}
+.rating{color:#e9b93f;font-weight:900}
 
-#staminaBox{
- position:absolute;z-index:60;left:22px;bottom:10px;
- width:145px;height:7px;border-radius:5px;
- background:#222;overflow:hidden
+.result{
+ display:flex;align-items:center;justify-content:center;
+ text-align:center;background:linear-gradient(145deg,#061126,#123b82)
 }
-#stamina{
- width:100%;height:100%;background:#ffd447
-}
-
-#message{
- position:absolute;z-index:80;top:22%;left:50%;
- transform:translateX(-50%);
- font-size:32px;font-weight:900;color:#ffd447;
- text-shadow:0 3px 8px #000;display:none;
- white-space:nowrap
-}
-
-#end{
- position:absolute;z-index:100;inset:0;
- display:none;align-items:center;justify-content:center;
- flex-direction:column;text-align:center;
- background:rgba(0,0,0,.84)
-}
-#end h1{font-size:38px;color:#ffd447;margin:0 0 15px}
-.finalScore{font-size:27px;margin-bottom:25px}
-
-.back{
- margin-top:15px;background:#253b62
-}
+.bigscore{font-size:70px;font-weight:1000;margin:20px 0}
 </style>
 </head>
 
 <body>
+<div id="app">
 
-<!-- ГЛАВНОЕ МЕНЮ -->
-<section id="menu" class="screen active">
- <div class="crown">👑</div>
- <div class="logo">AURELIA FC</div>
- <div class="subtitle">VALENCIA • ESPAÑA</div>
+<!-- MENU -->
+<section id="menu" class="screen active menu">
+ <div>
+  <div class="logo">AURELIA</div>
+  <div style="font-size:23px;font-weight:900">FOOTBALL 11.0</div>
+  <div class="sub">Aurelia FC • Valencia</div>
 
- <div class="menuButtons">
-  <button onclick="startMatch()">⚽ НАЧАТЬ МАТЧ</button>
-  <button onclick="showScreen('teamScreen')">👥 СОСТАВ</button>
-  <button onclick="showScreen('kitScreen')">👕 ФОРМА</button>
-  <button onclick="showScreen('tableScreen')">🏆 ТАБЛИЦА</button>
+  <button onclick="startMatch()">⚽ БЫСТРЫЙ МАТЧ</button>
+  <button onclick="showTeam()">👥 СОСТАВ</button>
+  <button onclick="showCareer()">🏆 КАРЬЕРА</button>
  </div>
 </section>
 
-<!-- СОСТАВ -->
-<section id="teamScreen" class="screen">
- <div class="title">👥 AURELIA FC</div>
-
+<!-- TEAM -->
+<section id="team" class="screen panel">
+ <h1>👥 Aurelia FC</h1>
  <div class="card">
-  <div class="playerRow">
-   <span>🧤 Mateo Soler — ВР</span><span class="rating">80</span>
-  </div>
-  <div class="playerRow">
-   <span>🛡️ Leo Vidal — ЗАЩ</span><span class="rating">78</span>
-  </div>
-  <div class="playerRow">
-   <span>🎯 Hugo Ferrer — ПЗ</span><span class="rating">81</span>
-  </div>
-  <div class="playerRow">
-   <span>⚡ Alejandro Rey — НП</span><span class="rating">86</span>
-  </div>
-  <div class="playerRow">
-   <span>🔥 Daniel Costa — НП</span><span class="rating">83</span>
-  </div>
+  <b>Схема</b>
+  <h2>4-3-3</h2>
+  <p>Атака 82 • Полузащита 79 • Защита 76</p>
  </div>
+ <div class="card" id="players"></div>
+ <button onclick="backMenu()">← Назад</button>
+</section>
 
+<!-- CAREER -->
+<section id="career" class="screen panel">
+ <h1>🏆 Карьера</h1>
  <div class="card">
-  <b>Схема</b><br><br>
-  4-3-3<br>
-  Атака: 82<br>
-  Полузащита: 79<br>
-  Защита: 76<br>
-  Общий рейтинг: <span class="rating">79</span>
+  <h2>Aurelia FC</h2>
+  <p>Сезон: 2026/27</p>
+  <p>Матчи: <b id="careerGames">0</b></p>
+  <p>Победы: <b id="careerWins">0</b></p>
+  <p>Голы: <b id="careerGoals">0</b></p>
+  <p>Бюджет: <b>€85M</b></p>
  </div>
-
- <button class="back" onclick="showScreen('menu')">← НАЗАД</button>
+ <div class="card">
+  <h2>🏟️ Aurelia Arena</h2>
+  <p>Вместимость: 52 000</p>
+  <p>Форма: Adidas</p>
+ </div>
+ <button onclick="backMenu()">← Назад</button>
 </section>
 
-<!-- ФОРМА -->
-<section id="kitScreen" class="screen">
- <div class="title">👕 ФОРМА</div>
- <div class="jersey"></div>
- <b>Домашняя — Royal Blue</b>
- <div class="jersey goldJersey"></div>
- <b>Третья — Gold</b>
- <button class="back" onclick="showScreen('menu')">← НАЗАД</button>
-</section>
-
-<!-- ТАБЛИЦА -->
-<section id="tableScreen" class="screen">
- <div class="title">🏆 ЛИГА</div>
-
- <table>
-  <tr><th>#</th><th>Клуб</th><th>И</th><th>О</th></tr>
-  <tr class="aureliaRow"><td>1</td><td>Aurelia FC</td><td>0</td><td>0</td></tr>
-  <tr><td>2</td><td>Valencia CF</td><td>0</td><td>0</td></tr>
-  <tr><td>3</td><td>Barcelona</td><td>0</td><td>0</td></tr>
-  <tr><td>4</td><td>Madrid FC</td><td>0</td><td>0</td></tr>
-  <tr><td>5</td><td>Sevilla</td><td>0</td><td>0</td></tr>
-  <tr><td>6</td><td>Bilbao</td><td>0</td><td>0</td></tr>
- </table>
-
- <button class="back" onclick="showScreen('menu')">← НАЗАД</button>
-</section>
-
-<!-- ИГРА -->
+<!-- GAME -->
 <section id="game" class="screen">
+ <div class="top">
+  <div class="score"><span id="homeScore">0</span> — <span id="awayScore">0</span></div>
+  <div class="timer" id="timer">03:00</div>
+  <div>🔵 AURELIA</div>
+ </div>
 
- <div id="stadium">
-  <div class="stand top">
-   <div class="flag f1"></div>
-   <div class="flag f2"></div>
-   <div class="flag f3"></div>
+ <button id="pauseBtn" onclick="togglePause()">Ⅱ</button>
+
+ <canvas id="field"></canvas>
+
+ <div class="controls">
+  <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
+
+  <div class="actions">
+   <button class="pass" id="pass">PASS</button>
+   <button class="shoot" id="shoot">SHOT</button>
+   <button class="tackle" id="tackle">TACKLE</button>
+   <button class="sprint" id="sprint">SPRINT</button>
   </div>
-  <div class="stand bottom"></div>
-  <div class="stand left"></div>
-  <div class="stand right"></div>
-
-  <div id="field">
-
-   <div class="fieldLine centerLine"></div>
-   <div class="fieldLine centerCircle"></div>
-   <div class="fieldLine boxL"></div>
-   <div class="fieldLine boxR"></div>
-
-   <div class="goal goalL"><div class="net"></div></div>
-   <div class="goal goalR"><div class="net"></div></div>
-
-   <div id="ball" class="entity ball"></div>
-
-   <div id="player" class="entity player">
-    <span class="number">9</span>
-   </div>
-
-   <div id="mate1" class="entity teammate">
-    <span class="number">7</span>
-   </div>
-
-   <div id="mate2" class="entity teammate">
-    <span class="number">10</span>
-   </div>
-
-   <div id="mate3" class="entity teammate">
-    <span class="number">11</span>
-   </div>
-
-   <div id="enemy1" class="entity enemy">
-    <span class="number">4</span>
-   </div>
-
-   <div id="enemy2" class="entity enemy">
-    <span class="number">5</span>
-   </div>
-
-   <div id="enemy3" class="entity enemy">
-    <span class="number">8</span>
-   </div>
-
-   <div id="enemy4" class="entity enemy">
-    <span class="number">10</span>
-   </div>
-
-   <div id="enemy5" class="entity enemy">
-    <span class="number">11</span>
-   </div>
-
-   <div id="gkA" class="entity gkBlue">
-    <span class="number">1</span>
-   </div>
-
-   <div id="gkB" class="entity gkRed">
-    <span class="number">1</span>
-   </div>
-
-  </div>
- </div>
-
- <div id="hud">
-  <div id="score">AURELIA 0 : 0 RIVAL</div>
-  <div id="clock">90:00</div>
- </div>
-
- <button id="pause" onclick="pauseGame()">Ⅱ</button>
-
- <div id="message">⚽ GOOOOL!</div>
-
- <div id="joy">
-  <div id="stick"></div>
- </div>
-
- <button id="shoot" class="action">⚽</button>
- <button id="pass" class="action">↗</button>
- <button id="cross" class="action">↗↗</button>
- <button id="sprint" class="action">⚡</button>
-
- <div id="staminaBox">
-  <div id="stamina"></div>
- </div>
-
- <div id="end">
-  <h1>МАТЧ ОКОНЧЕН</h1>
-  <div id="finalScore" class="finalScore"></div>
-  <button onclick="restartMatch()">🔄 ЕЩЁ РАЗ</button>
-  <button class="back" onclick="showScreen('menu')">🏠 МЕНЮ</button>
  </div>
 </section>
+
+<!-- RESULT -->
+<section id="result" class="screen result">
+ <div>
+  <div style="font-size:25px;font-weight:900">МАТЧ ОКОНЧЕН</div>
+  <div class="bigscore" id="finalScore">0 — 0</div>
+  <div id="resultText"></div>
+  <br>
+  <button onclick="startMatch()">🔄 Новый матч</button>
+  <button onclick="backMenu()">🏠 Меню</button>
+ </div>
+</section>
+
+</div>
 
 <script>
- const $=id=>document.getElementById(id);
+const canvas=document.getElementById("field");
+const ctx=canvas.getContext("2d");
 
-let running=false;
-let paused=false;
-let lastTime=0;
-let matchTime=0;
+let W,H;
+function resize(){
+ W=canvas.width=innerWidth*devicePixelRatio;
+ H=canvas.height=innerHeight*devicePixelRatio;
+ canvas.style.width=innerWidth+"px";
+ canvas.style.height=innerHeight+"px";
+ ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+ W=innerWidth;H=innerHeight;
+}
+addEventListener("resize",resize);
+resize();
 
-let scoreA=0;
-let scoreB=0;
-
-let px=27,py=50;
-let bx=30,by=50;
-let ballVX=0,ballVY=0;
-
-let stamina=100;
-let sprinting=false;
-
-let joyDX=0,joyDY=0;
-let joyActive=false;
-
-const teammates=[
- {el:$("mate1"),x:42,y:32},
- {el:$("mate2"),x:43,y:68},
- {el:$("mate3"),x:52,y:50}
+const players=[
+ ["Mateo Soler","GK",80],
+ ["Leo Vidal","DEF",78],
+ ["Marco Ruiz","DEF",77],
+ ["Ivan Torres","DEF",75],
+ ["Luis Navarro","DEF",76],
+ ["Hugo Ferrer","MID",81],
+ ["Carlos Vega","MID",79],
+ ["Bruno Santos","MID",78],
+ ["Alejandro Rey","FWD",86],
+ ["Daniel Costa","FWD",83],
+ ["Mateo Silva","FWD",80]
 ];
 
-const enemies=[
- {el:$("enemy1"),x:55,y:28,speed:.045},
- {el:$("enemy2"),x:60,y:45,speed:.052},
- {el:$("enemy3"),x:55,y:72,speed:.045},
- {el:$("enemy4"),x:72,y:35,speed:.04},
- {el:$("enemy5"),x:72,y:65,speed:.04}
-];
+function showTeam(){
+ hideAll();team.classList.add("active");
+ document.getElementById("players").innerHTML=
+ players.map((p,i)=>`
+ <div class="player">
+  <span>${i+1}. ${p[0]} <small>${p[1]}</small></span>
+  <span class="rating">${p[2]}</span>
+ </div>`).join("");
+}
 
-const gkA={
- el:$("gkA"),x:9,y:50,targetY:50
-};
+let career=JSON.parse(localStorage.getItem("aureliaCareer")||'{"games":0,"wins":0,"goals":0}');
 
-const gkB={
- el:$("gkB"),x:91,y:50,targetY:50
-};
+function showCareer(){
+ hideAll();career.classList.add("active");
+ careerGames.textContent=career.games;
+ careerWins.textContent=career.wins;
+ careerGoals.textContent=career.goals;
+}
 
-function showScreen(id){
- document.querySelectorAll(".screen").forEach(s=>{
-  s.classList.remove("active");
- });
- $(id).classList.add("active");
+function hideAll(){
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+}
+function backMenu(){hideAll();menu.classList.add("active")}
+
+let gameRunning=false,paused=false;
+let timeLeft=180;
+let home=0,away=0;
+let last=0;
+
+const ball={x:.5,y:.5,vx:0,vy:0,owner:0};
+let user={x:.35,y:.5,vx:0,vy:0,energy:100};
+let mates=[];
+let enemies=[];
+let keeper={x:.94,y:.5};
+
+function resetPlayers(){
+ mates=[
+  {x:.25,y:.28},{x:.25,y:.72},{x:.38,y:.35},
+  {x:.38,y:.65},{x:.48,y:.5},{x:.57,y:.28},
+  {x:.57,y:.72},{x:.68,y:.4},{x:.68,y:.6}
+ ];
+
+ enemies=[
+  {x:.75,y:.25},{x:.78,y:.38},{x:.82,y:.5},
+  {x:.78,y:.62},{x:.75,y:.75},{x:.63,y:.3},
+  {x:.63,y:.7},{x:.55,y:.45},{x:.88,y:.5}
+ ];
 }
 
 function startMatch(){
- showScreen("game");
-
- running=true;
- paused=false;
-
- matchTime=0;
- scoreA=0;
- scoreB=0;
-
- px=27;
- py=50;
- bx=30;
- by=50;
-
- ballVX=0;
- ballVY=0;
-
- stamina=100;
-
- enemies[0].x=55;
- enemies[0].y=28;
- enemies[1].x=60;
- enemies[1].y=45;
- enemies[2].x=55;
- enemies[2].y=72;
- enemies[3].x=72;
- enemies[3].y=35;
- enemies[4].x=72;
- enemies[4].y=65;
-
- gkA.y=50;
- gkB.y=50;
-
- updateScore();
- render();
-
- lastTime=performance.now();
- requestAnimationFrame(gameLoop);
+ hideAll();game.classList.add("active");
+ home=away=0;timeLeft=180;paused=false;
+ user={x:.32,y:.5,vx:0,vy:0,energy:100};
+ ball.x=.5;ball.y=.5;ball.vx=ball.vy=0;ball.owner=0;
+ keeper={x:.94,y:.5};
+ resetPlayers();
+ gameRunning=true;
+ last=performance.now();
+ requestAnimationFrame(loop);
 }
 
-function restartMatch(){
- $("end").style.display="none";
- startMatch();
-}
-
-function pauseGame(){
- if(!running)return;
-
+function togglePause(){
  paused=!paused;
-
- $("pause").textContent=paused?"▶":"Ⅱ";
+ document.getElementById("pauseBtn").textContent=paused?"▶":"Ⅱ";
 }
 
-function gameLoop(now){
+function fieldPos(x,y){
+ return [x*W,y*H];
+}
 
- if(!running)return;
+function drawField(){
+ ctx.fillStyle="#17652d";
+ ctx.fillRect(0,0,W,H);
 
- let dt=(now-lastTime)/1000;
- lastTime=now;
-
- if(dt>.05)dt=.05;
-
- if(!paused){
-  update(dt);
+ for(let i=0;i<12;i++){
+  ctx.fillStyle=i%2?"#1b7133":"#17652d";
+  ctx.fillRect(i*W/12,65,(W/12)+1,H-65);
  }
 
- requestAnimationFrame(gameLoop);
+ ctx.strokeStyle="rgba(255,255,255,.85)";
+ ctx.lineWidth=3;
+
+ ctx.strokeRect(25,80,W-50,H-110);
+
+ ctx.beginPath();
+ ctx.moveTo(W/2,80);ctx.lineTo(W/2,H-30);ctx.stroke();
+
+ ctx.beginPath();
+ ctx.arc(W/2,(H+50)/2,70,0,Math.PI*2);ctx.stroke();
+
+ ctx.strokeRect(25,(H+50)/2-100,100,200);
+ ctx.strokeRect(W-125,(H+50)/2-100,100,200);
+
+ ctx.fillStyle="rgba(255,255,255,.85)";
+ ctx.fillRect(8,(H+50)/2-38,17,76);
+ ctx.fillRect(W-25,(H+50)/2-38,17,76);
+}
+
+function circle(x,y,r,color){
+ ctx.beginPath();ctx.arc(x*W,y*H,r,0,Math.PI*2);
+ ctx.fillStyle=color;ctx.fill();
+}
+
+function drawPlayer(x,y,color,r=13){
+ circle(x,y,r,color);
+ ctx.strokeStyle="white";ctx.lineWidth=2;
+ ctx.stroke();
+}
+
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ drawField();
+
+ // teammates
+ mates.forEach((p,i)=>{
+  drawPlayer(p.x,p.y,"#2166ff",11);
+  ctx.fillStyle="white";ctx.font="10px Arial";
+  ctx.fillText(i+1,p.x*W-3,p.y*H+3);
+ });
+
+ // opponents
+ enemies.forEach(p=>drawPlayer(p.x,p.y,"#e43d45",11));
+
+ // goalkeeper
+ drawPlayer(keeper.x,keeper.y,"#ffd34d",14);
+
+ // controlled player
+ drawPlayer(user.x,user.y,"#51a7ff",16);
+ ctx.strokeStyle="#ffd34d";ctx.lineWidth=3;
+ ctx.beginPath();ctx.arc(user.x*W,user.y*H,21,0,Math.PI*2);ctx.stroke();
+
+ // ball
+ circle(ball.x,ball.y,7,"#fff");
+ ctx.strokeStyle="#111";ctx.lineWidth=1;
+ ctx.stroke();
+
+ // stamina
+ ctx.fillStyle="rgba(0,0,0,.5)";
+ ctx.fillRect(20,75,120,8);
+ ctx.fillStyle="#4ce27b";
+ ctx.fillRect(20,75,120*(user.energy/100),8);
+}
+
+let joyX=0,joyY=0,sprinting=false;
+
+const joy=document.getElementById("joy");
+const knob=document.getElementById("knob");
+
+function joyMove(e){
+ const r=joy.getBoundingClientRect();
+ const t=e.touches?e.touches[0]:e;
+ let dx=t.clientX-(r.left+r.width/2);
+ let dy=t.clientY-(r.top+r.height/2);
+ const max=42;
+ const len=Math.hypot(dx,dy);
+ if(len>max){dx=dx/len*max;dy=dy/len*max}
+ knob.style.transform=`translate(${dx}px,${dy}px)`;
+ joyX=dx/max;joyY=dy/max;
+}
+
+function joyEnd(){
+ joyX=joyY=0;
+ knob.style.transform="translate(0,0)";
+}
+
+joy.addEventListener("touchstart",e=>{e.preventDefault();joyMove(e)});
+joy.addEventListener("touchmove",e=>{e.preventDefault();joyMove(e)});
+joy.addEventListener("touchend",joyEnd);
+
+document.getElementById("sprint").addEventListener("touchstart",e=>{
+ e.preventDefault();sprinting=true
+});
+document.getElementById("sprint").addEventListener("touchend",()=>sprinting=false);
+
+document.getElementById("pass").addEventListener("touchstart",e=>{
+ e.preventDefault();passBall();
+});
+
+document.getElementById("shoot").addEventListener("touchstart",e=>{
+ e.preventDefault();shootBall();
+});
+
+document.getElementById("tackle").addEventListener("touchstart",e=>{
+ e.preventDefault();tackle();
+});
+
+function distance(a,b){
+ return Math.hypot(a.x-b.x,a.y-b.y);
+}
+
+function passBall(){
+ if(ball.owner!==0)return;
+
+ let best=null,bd=999;
+ mates.forEach(p=>{
+  const d=distance(user,p);
+  if(d<bd){bd=d;best=p}
+ });
+ if(best){
+  ball.vx=(best.x-user.x)*3;
+  ball.vy=(best.y-user.y)*3;
+  ball.owner=0;
+ }
+}
+
+function shootBall(){
+ if(distance(user,ball)<.08 || ball.owner===0){
+  ball.owner=0;
+  const targetX=1;
+  ball.vx=3.8;
+  ball.vy=(.5-user.y)*2.8;
+ }
+}
+
+function tackle(){
+ enemies.forEach(p=>{
+  if(distance(user,p)<.07 && ball.owner===2){
+   ball.owner=0;
+   ball.x=user.x;
+   ball.y=user.y;
+   ball.vx=.7;
+   ball.vy=joyY;
+  }
+ });
 }
 
 function update(dt){
+ if(paused)return;
 
- updatePlayer(dt);
- updateBall(dt);
- updateAI(dt);
- updateGoalkeepers(dt);
- updateTeammates(dt);
- updateClock(dt);
- render();
-}
+ // player movement
+ let speed=sprinting&&user.energy>0?.34:.22;
+ if(sprinting&&Math.hypot(joyX,joyY)>.1)user.energy-=30*dt;
+ else user.energy+=18*dt;
+ user.energy=Math.max(0,Math.min(100,user.energy));
 
-function updatePlayer(dt){
+ user.x+=joyX*speed*dt;
+ user.y+=joyY*speed*dt;
 
- let speed=.24;
+ user.x=Math.max(.06,Math.min(.94,user.x));
+ user.y=Math.max(.14,Math.min(.86,user.y));
 
- if(sprinting && stamina>0){
-  speed=.40;
-  stamina-=28*dt;
- }else{
-  stamina+=18*dt;
+ // ball following player
+ if(distance(user,ball)<.075 && Math.hypot(ball.vx,ball.vy)<1.2){
+  ball.x=user.x+joyX*.045;
+  ball.y=user.y+joyY*.045;
+  ball.vx=joyX*.3;
+  ball.vy=joyY*.3;
  }
 
- stamina=Math.max(0,Math.min(100,stamina));
+ // ball physics
+ ball.x+=ball.vx*dt;
+ ball.y+=ball.vy*dt;
+ ball.vx*=Math.pow(.08,dt);
+ ball.vy*=Math.pow(.08,dt);
 
- $("stamina").style.width=stamina+"%";
+ // enemy AI
+ enemies.forEach(p=>{
+  let target={x:.5,y:.5};
 
- px+=joyDX*speed*(dt*60);
- py+=joyDY*speed*(dt*60);
-
- px=Math.max(3,Math.min(97,px));
- py=Math.max(5,Math.min(95,py));
-
- let distance=Math.hypot(px-bx,py-by);
-
- if(distance<5 && Math.abs(ballVX)<.35){
-
-  bx=px+joyDX*3;
-  by=py+joyDY*3;
-
- }
-}
-
-function updateBall(dt){
-
- bx+=ballVX*(dt*60);
- by+=ballVY*(dt*60);
-
- ballVX*=Math.pow(.965,dt*60);
- ballVY*=Math.pow(.965,dt*60);
-
- if(by<3){
-  by=3;
-  ballVY=Math.abs(ballVY)*.75;
- }
-
- if(by>97){
-  by=97;
-  ballVY=-Math.abs(ballVY)*.75;
- }
-
- // ЛЕВЫЕ ВОРОТА
-
- if(bx<1){
-
-  if(Math.abs(by-50)<15){
-
-   if(Math.abs(by-gkA.y)<9){
-    ballVX=.75;
-    bx=6;
-    showMessage("🧤 СЕЙВ!");
-   }else{
-    goalAgainst();
-   }
-
+  if(ball.x>.55){
+   target=ball;
   }else{
-   bx=3;
-   ballVX=Math.abs(ballVX)*.6;
-  }
- }
-
- // ПРАВЫЕ ВОРОТА
-
- if(bx>99){
-
-  if(Math.abs(by-50)<15){
-
-   if(Math.abs(by-gkB.y)<9){
-    ballVX=-.75;
-    bx=94;
-    showMessage("🧤 ВРАТАРЬ ОТБИЛ!");
-   }else{
-    goalFor();
-   }
-
-  }else{
-   bx=97;
-   ballVX=-Math.abs(ballVX)*.6;
-  }
- }
-
- // столкновение с игроками
-
- enemies.forEach(e=>{
-  let d=Math.hypot(e.x-bx,e.y-by);
-
-  if(d<3.5){
-
-   if(ballVX>.08){
-    ballVX=-.25;
-    ballVY+=(by-e.y)*.04;
-   }
-
-   if(Math.hypot(e.x-px,e.y-py)<4.5){
-    bx=e.x-2;
-    by=e.y;
-    ballVX=-.18;
-   }
-  }
- });
-}
-
-function updateAI(dt){
-
- enemies.forEach((e,index)=>{
-
-  let targetX=bx;
-  let targetY=by;
-
-  // центральные защитники преследуют мяч
-  if(index<3){
-
-   let dx=targetX-e.x;
-   let dy=targetY-e.y;
-   let d=Math.hypot(dx,dy)||1;
-
-   e.x+=(dx/d)*e.speed*(dt*60);
-   e.y+=(dy/d)*e.speed*(dt*60);
-
-  }else{
-
-   // атакующие соперники идут к воротам Aurelia
-   if(bx>55){
-
-    let dx=bx-e.x;
-    let dy=by-e.y;
-    let d=Math.hypot(dx,dy)||1;
-
-    e.x+=(dx/d)*e.speed*(dt*60);
-    e.y+=(dy/d)*e.speed*(dt*60);
-
-   }else{
-
-    e.x+=(60-e.x)*.008;
-    e.y+=(50-e.y)*.008;
-   }
+   target={x:.48,y:.5};
   }
 
-  e.x=Math.max(10,Math.min(92,e.x));
-  e.y=Math.max(5,Math.min(95,e.y));
- });
-}
+  const dx=target.x-p.x,dy=target.y-p.y;
+  const d=Math.hypot(dx,dy)||1;
 
-function updateGoalkeepers(dt){
+  p.x+=dx/d*.10*dt;
+  p.y+=dy/d*.10*dt;
 
- // вратарь Aurelia
- gkA.targetY=by;
-
- if(gkA.targetY<38)gkA.targetY=38;
- if(gkA.targetY>62)gkA.targetY=62;
-
- gkA.y+=(gkA.targetY-gkA.y)*.08*(dt*60);
-
- // вратарь соперника
- gkB.targetY=by;
-
- if(gkB.targetY<38)gkB.targetY=38;
- if(gkB.targetY>62)gkB.targetY=62;
-
- gkB.y+=(gkB.targetY-gkB.y)*.08*(dt*60);
-}
-
-function updateTeammates(dt){
-
- teammates.forEach((m,i)=>{
-
-  if(i===0){
-   m.x+=(42-m.x)*.01;
-   m.y+=(32-m.y)*.01;
+  if(distance(p,ball)<.035 && ball.owner===0){
+   ball.owner=2;
+   ball.vx=ball.vy=0;
   }
 
-  if(i===1){
-   m.x+=(43-m.x)*.01;
-   m.y+=(68-m.y)*.01;
-  }
-
-  if(i===2){
-   m.x+=(Math.max(48,bx-5)-m.x)*.012;
-   m.y+=(by-m.y)*.012;
-  }
-
-  m.x=Math.max(8,Math.min(88,m.x));
-  m.y=Math.max(7,Math.min(93,m.y));
- });
-}
-
-function updateClock(dt){
-
- matchTime+=dt;
-
- let remaining=Math.max(0,180-matchTime);
-
- let minutes=Math.floor(remaining/60);
- let seconds=Math.floor(remaining%60);
-
- $("clock").textContent=
-  minutes+":"+String(seconds).padStart(2,"0");
-
- if(matchTime>=180){
-  finishMatch();
- }
-}
-
-function kick(powerX,powerY,power){
-
- let d=Math.hypot(powerX,powerY)||1;
-
- ballVX=(powerX/d)*power;
- ballVY=(powerY/d)*power;
-
- bx=px+(powerX/d)*4;
- by=py+(powerY/d)*4;
-}
-
-$("shoot").addEventListener("pointerdown",()=>{
-
- if(!running||paused)return;
-
- let x=joyDX;
- let y=joyDY;
-
- if(Math.abs(x)+Math.abs(y)<.1){
-  x=1;
-  y=0;
- }
-
- kick(x,y,.85);
-});
-
-$("pass").addEventListener("pointerdown",()=>{
-
- if(!running||paused)return;
-
- let target=teammates[0];
-
- let best=999;
-
- teammates.forEach(m=>{
-  let d=Math.hypot(m.x-px,m.y-py);
-
-  if(d<best){
-   best=d;
-   target=m;
+  if(ball.owner===2 && distance(p,ball)<.03){
+   ball.vx=-.7;
+   ball.vy=(.5-ball.y)*1.3;
+   ball.owner=2;
   }
  });
 
- let dx=target.x-px;
- let dy=target.y-py;
+ // goalkeeper
+ keeper.y += (.5-ball.y)*.7*dt;
+ keeper.y=Math.max(.22,Math.min(.78,keeper.y));
 
- kick(dx,dy,.55);
-});
-
-$("cross").addEventListener("pointerdown",()=>{
-
- if(!running||paused)return;
-
- let direction=px<50?1:-1;
-
- kick(direction,-.45,.72);
-
- showMessage("↗ НАВЕС!");
-});
-
-$("sprint").addEventListener("pointerdown",()=>{
- sprinting=true;
-});
-
-$("sprint").addEventListener("pointerup",()=>{
- sprinting=false;
-});
-
-$("sprint").addEventListener("pointercancel",()=>{
- sprinting=false;
-});
-
-function goalFor(){
-
- scoreA++;
-
- showMessage("⚽ GOOOOOL!");
-
- bx=50;
- by=50;
-
- ballVX=0;
- ballVY=0;
-
- px=27;
- py=50;
-
- updateScore();
-
- setTimeout(()=>{
-  $("message").style.display="none";
- },1400);
-}
-
-function goalAgainst(){
-
- scoreB++;
-
- showMessage("😱 ПРОПУЩЕН ГОЛ!");
-
- bx=50;
- by=50;
-
- ballVX=0;
- ballVY=0;
-
- px=27;
- py=50;
-
- updateScore();
-
- setTimeout(()=>{
-  $("message").style.display="none";
- },1400);
-}
-
-function updateScore(){
-
- $("score").textContent=
-  "AURELIA "+scoreA+" : "+scoreB+" RIVAL";
-}
-
-function showMessage(text){
-
- $("message").textContent=text;
- $("message").style.display="block";
-
- clearTimeout(window.messageTimer);
-
- window.messageTimer=setTimeout(()=>{
-  $("message").style.display="none";
- },1200);
-}
-
-function render(){
-
- $("player").style.left=px+"%";
- $("player").style.top=py+"%";
-
- $("ball").style.left=bx+"%";
- $("ball").style.top=by+"%";
-
- teammates.forEach(m=>{
-  m.el.style.left=m.x+"%";
-  m.el.style.top=m.y+"%";
- });
-
- enemies.forEach(e=>{
-  e.el.style.left=e.x+"%";
-  e.el.style.top=e.y+"%";
- });
-
- gkA.el.style.left=gkA.x+"%";
- gkA.el.style.top=gkA.y+"%";
-
- gkB.el.style.left=gkB.x+"%";
- gkB.el.style.top=gkB.y+"%";
-}
-
-// -----------------------------
-// ВИРТУАЛЬНЫЙ ДЖОЙСТИК
-// -----------------------------
-
-const joy=$("joy");
-const stick=$("stick");
-
-function moveJoy(e){
-
- let rect=joy.getBoundingClientRect();
-
- let cx=rect.left+rect.width/2;
- let cy=rect.top+rect.height/2;
-
- let x=e.clientX-cx;
- let y=e.clientY-cy;
-
- const max=52;
-
- let distance=Math.hypot(x,y);
-
- if(distance>max){
-
-  x=x/distance*max;
-  y=y/distance*max;
-
+ // goals
+ if(ball.x>.975 && ball.y>.38 && ball.y<.62){
+  home++;
+  goalReset(1);
+ }
+ if(ball.x<.025 && ball.y>.38 && ball.y<.62){
+  away++;
+  goalReset(2);
  }
 
- stick.style.transform=
-  "translate("+x+"px,"+y+"px)";
-
- joyDX=x/max;
- joyDY=y/max;
+ ball.x=Math.max(.02,Math.min(.98,ball.x));
+ ball.y=Math.max(.13,Math.min(.87,ball.y));
 }
 
-joy.addEventListener("pointerdown",e=>{
+function goalReset(team){
+ document.getElementById("homeScore").textContent=home;
+ document.getElementById("awayScore").textContent=away;
 
- joyActive=true;
+ ball.x=.5;ball.y=.5;ball.vx=ball.vy=0;ball.owner=0;
+ user.x=.32;user.y=.5;
+ resetPlayers();
+}
 
- joy.setPointerCapture(e.pointerId);
+function loop(now){
+ if(!gameRunning)return;
 
- moveJoy(e);
-});
+ const dt=Math.min((now-last)/1000,.05);
+ last=now;
 
-joy.addEventListener("pointermove",e=>{
-
- if(joyActive){
-  moveJoy(e);
+ if(!paused){
+  timeLeft-=dt;
+  if(timeLeft<=0){
+   timeLeft=0;
+   finishMatch();
+   return;
+  }
  }
-});
 
-function releaseJoy(){
+ const min=Math.floor(timeLeft/60);
+ const sec=Math.floor(timeLeft%60);
+ document.getElementById("timer").textContent=
+  `${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
 
- joyActive=false;
-
- joyDX=0;
- joyDY=0;
-
- stick.style.transform="translate(0,0)";
-}
-
-joy.addEventListener("pointerup",releaseJoy);
-joy.addEventListener("pointercancel",releaseJoy);
-
-document.addEventListener("contextmenu",e=>e.preventDefault());
-
-document.addEventListener("gesturestart",e=>{
- e.preventDefault();
-});
-
-// -----------------------------
-// СОХРАНЕНИЕ
-// -----------------------------
-
-function saveProgress(){
-
- localStorage.setItem(
-  "aurelia_fc_score",
-  JSON.stringify({
-   scoreA:scoreA,
-   scoreB:scoreB
-  })
- );
+ update(dt);
+ draw();
+ requestAnimationFrame(loop);
 }
 
 function finishMatch(){
+ gameRunning=false;
+ career.games++;
+ career.goals+=home;
+ if(home>away)career.wins++;
+ localStorage.setItem("aureliaCareer",JSON.stringify(career));
 
- if(!running)return;
+ hideAll();result.classList.add("active");
 
- running=false;
+ document.getElementById("finalScore").textContent=`${home} — ${away}`;
 
- saveProgress();
-
- $("finalScore").textContent=
-  "AURELIA "+scoreA+" : "+scoreB+" RIVAL";
-
- $("end").style.display="flex";
+ document.getElementById("resultText").textContent=
+  home>away?"🏆 Победа Aurelia FC!":
+  home<away?"😕 Поражение":"🤝 Ничья";
 }
-
-render();
 </script>
-
 </body>
 </html>
